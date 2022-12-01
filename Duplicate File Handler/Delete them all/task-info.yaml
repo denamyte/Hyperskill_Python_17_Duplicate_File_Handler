@@ -194,7 +194,7 @@ files:
     \        output = main.execute(\"\").lower()\n        output = main.execute(\"\
     1\").lower()\n        output = main.execute(\"yes\").lower().split('\\n')\n\n\
     \        n = 1\n        for val in output:\n            if '.' in val:\n     \
-    \           if val[0] != str(n):\n                    return CheckResult.wrong(f\"\
+    \           if val.split('.')[0] != str(n):\n                    return CheckResult.wrong(f\"\
     Wrong file numbering. File: {val} \")\n                n += 1\n        return\
     \ CheckResult.correct()\n\n    @dynamic_test()\n    def check_duplicate_hash(self):\n\
     \        main = TestedProgram()\n        output = main.start(root_dir_path).lower()\n\

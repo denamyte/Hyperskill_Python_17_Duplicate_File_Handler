@@ -1,5 +1,6 @@
 import sys
-from os import walk, path
+from input import HandlerInput
+from analysis import Analysis
 
 
 def main():
@@ -7,9 +8,10 @@ def main():
         print('Directory is not specified')
         return
     folder = sys.argv[1]
-    for root, dirs, files in walk(folder):
-        for f_name in files:
-            print(path.join(root, f_name))
+    h_input = HandlerInput()
+    fmt = h_input.enter_format()
+    sorting_option = h_input.enter_size_option()
+    Analysis(folder, fmt, sorting_option).print()
 
 
 if __name__ == '__main__':
