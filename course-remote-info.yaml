@@ -3,7 +3,7 @@ hyperskill_project:
   ide_files: https://stepik.org/media/attachments/lesson/518715/additional_files.json
   is_template_based: false
   use_ide: true
-update_date: "Thu, 01 Dec 2022 07:14:16 UTC"
+update_date: "Mon, 12 Dec 2022 19:28:52 UTC"
 stages:
 - id: 905
   step: 12944
@@ -13,7 +13,7 @@ stages:
   is_completed: true
 - id: 907
   step: 12946
-  is_completed: false
+  is_completed: true
 - id: 908
   step: 12947
   is_completed: false
@@ -27,6 +27,8 @@ topics:
     theory_id: 13025
   - title: Computer programming
     theory_id: 8739
+  - title: Paradigms
+    theory_id: 15860
   - title: Introduction to OOP
     theory_id: 3614
   - title: Introduction to Python

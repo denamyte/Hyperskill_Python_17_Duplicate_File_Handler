@@ -1,3 +1,4 @@
+import hashlib
 from collections import defaultdict
 from os import walk, path
 from typing import List, Dict
@@ -9,8 +10,9 @@ class Analysis:
         self._format = fmt
         self._sorting_option = sorting_option
         self._file_dict: Dict[int, List[str]] = defaultdict(list)
+        self._hash_dict: Dict[int, Dict[str, List[str]] ] = defaultdict(lambda: defaultdict(list))
         self._group_by_size()
-        self._sort_and_filter()
+        self._sort_by_size_and_filter()
 
     def _group_by_size(self):
         for root, dirs, files in walk(self._folder):
@@ -20,15 +22,45 @@ class Analysis:
                     size = path.getsize(file_path)
                     self._file_dict[size].append(file_path)
 
-    def _sort_and_filter(self):
+    def _sort_by_size_and_filter(self):
         new_dict = defaultdict(list)
         for s in sorted(self._file_dict.keys(),  reverse=self._sorting_option == 1):
             if len(self._file_dict[s]) > 1:
                 new_dict[s] = self._file_dict[s]
         self._file_dict = new_dict
 
-    def print(self):
-        for s in self._file_dict:
-            print(f'\n{s} bytes')
-            for name in self._file_dict[s]:
+    def print_sorted_by_size(self):
+        for size in self._file_dict:
+            print(f'\n{size} bytes')
+            for name in self._file_dict[size]:
                 print(name)
+
+    def sort_by_hash(self):
+        for size in self._file_dict:
+            for file_name in self._file_dict[size]:
+                file_dict = self._hash_dict[size]
+                with open(file_name, 'rb') as file:
+                    hash_str = hashlib.md5(file.read()).hexdigest()
+                    file_dict[hash_str].append(file_name)
+
+        sizes = list(self._hash_dict.keys())
+        for size in sizes:
+            file_dict = self._hash_dict[size]
+            hashes = list(file_dict.keys())
+            for h in hashes:
+                if len(file_dict[h]) <= 1:
+                    del file_dict[h]
+            if not len(file_dict):
+                del self._hash_dict[size]
+
+    def print_sorted_by_hash(self):
+        counter = 0
+        for size in self._hash_dict:
+            print(f'\n{size} bytes')
+            file_dict = self._hash_dict[size]
+            for h in file_dict:
+                print(f'Hash: {h}')
+                names = file_dict[h]
+                for name in names:
+                    counter += 1
+                    print(f'{counter}. {name}')

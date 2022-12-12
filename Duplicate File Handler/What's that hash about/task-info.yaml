@@ -249,6 +249,71 @@ files:
     if __name__ == '__main__':
         DuplicateFileHandlerCheck().run_tests()
   learner_created: false
+- name: input.py
+  visible: true
+  text: |+
+    class HandlerInput:
+        SORTING_OPTIONS = ('1', '2')
+
+        @staticmethod
+        def enter_format() -> str:
+            return input('\nEnter file format:\n')
+
+        @staticmethod
+        def enter_size_option() -> int:
+            print('''
+    Size sorting options:
+    1. Descending
+    2. Ascending''')
+
+            while True:
+                option = input('\nEnter a sorting option:\n')
+                if option in HandlerInput.SORTING_OPTIONS:
+                    return int(option)
+                print('\nWrong option')
+
+  learner_created: true
+- name: analysis.py
+  visible: true
+  text: |
+    from collections import defaultdict
+    from os import walk, path
+    from typing import List, Dict
+
+
+    class Analysis:
+        def __init__(self, folder: str, fmt: str, sorting_option):
+            self._folder = folder
+            self._format = fmt
+            self._sorting_option = sorting_option
+            self._file_dict: Dict[int, List[str]] = defaultdict(list)
+            self._group_by_size()
+            self._sort_and_filter()
+
+        def _group_by_size(self):
+            for root, dirs, files in walk(self._folder):
+                for f_name in files:
+                    if f_name.endswith(self._format):
+                        file_path = path.join(root, f_name)
+                        size = path.getsize(file_path)
+                        self._file_dict[size].append(file_path)
+
+        def _sort_and_filter(self):
+            new_dict = defaultdict(list)
+            for s in sorted(self._file_dict.keys(),  reverse=self._sorting_option == 1):
+                if len(self._file_dict[s]) > 1:
+                    new_dict[s] = self._file_dict[s]
+            self._file_dict = new_dict
+
+        def print(self):
+            for s in self._file_dict:
+                print(f'\n{s} bytes')
+                for name in self._file_dict[s]:
+                    print(name)
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/12946#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Mon, 12 Dec 2022 22:57:27 UTC"
 record: -1

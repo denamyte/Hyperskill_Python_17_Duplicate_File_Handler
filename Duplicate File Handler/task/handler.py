@@ -11,7 +11,12 @@ def main():
     h_input = HandlerInput()
     fmt = h_input.enter_format()
     sorting_option = h_input.enter_size_option()
-    Analysis(folder, fmt, sorting_option).print()
+    analysis = Analysis(folder, fmt, sorting_option)
+    analysis.print_sorted_by_size()
+    if not h_input.check_for_duplicates():
+        return
+    analysis.sort_by_hash()
+    analysis.print_sorted_by_hash()
 
 
 if __name__ == '__main__':
