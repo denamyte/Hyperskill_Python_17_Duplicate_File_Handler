@@ -1,4 +1,5 @@
 import hashlib
+import os.path
 from collections import defaultdict
 from os import walk, path
 from typing import List, Dict
@@ -28,6 +29,10 @@ class Analysis:
             if len(self._file_dict[s]) > 1:
                 new_dict[s] = self._file_dict[s]
         self._file_dict = new_dict
+
+    @property
+    def has_sorted(self) -> bool:
+        return len(self._file_dict) > 0
 
     def print_sorted_by_size(self):
         for size in self._file_dict:
@@ -64,3 +69,30 @@ class Analysis:
                 for name in names:
                     counter += 1
                     print(f'{counter}. {name}')
+
+    @property
+    def duplicate_count(self) -> int:
+        counter = 0
+        for size in self._hash_dict:
+            for h in self._hash_dict[size]:
+                names = self._hash_dict[size][h]
+                counter += len(names)
+        return counter
+
+    def remove_files(self, file_numbers: List[int]) -> int:
+        """
+        removes selected files and returns their size
+        :param file_numbers the numbers of files to delete
+        :return the total freed up space
+        """
+        file_size_sum = 0
+        file_counter = 0
+        for size in self._hash_dict:
+            for h in self._hash_dict[size]:
+                names = self._hash_dict[size][h]
+                for name in names:
+                    file_counter += 1
+                    if file_counter in file_numbers:
+                         file_size_sum += os.path.getsize(name)
+                         os.remove(name)
+        return file_size_sum

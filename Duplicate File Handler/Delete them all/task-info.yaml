@@ -286,6 +286,97 @@ files:
     if __name__ == '__main__':
         DuplicateFileHandlerCheck().run_tests()
   learner_created: false
+- name: input.py
+  visible: true
+  text: "from typing import Tuple\n\n\nclass HandlerInput:\n    SORTING_PROMPT = '''\n\
+    Size sorting options: \n1. Descending\n2. Ascending'''\n    CHECK_PROMPT = '''\n\
+    Check for duplicates?'''\n    SORTING_OPTIONS = ('1', '2')\n    CHECK_OPTIONS\
+    \ = ('yes', 'no')\n\n    @staticmethod\n    def enter_format() -> str:\n     \
+    \   return input('\\nEnter file format:\\n')\n\n    @staticmethod\n    def enter_size_option()\
+    \ -> int:\n        return int(HandlerInput.read_input_with_wrong_options(\n  \
+    \          HandlerInput.SORTING_PROMPT,\n            '\\nEnter a sorting option:\\\
+    n',\n            HandlerInput.SORTING_OPTIONS))\n\n    @staticmethod\n    def\
+    \ check_for_duplicates() -> bool:\n        return 'yes' == HandlerInput.read_input_with_wrong_options(\n\
+    \            HandlerInput.CHECK_PROMPT,\n            '',\n            HandlerInput.CHECK_OPTIONS)\n\
+    \n    @staticmethod\n    def read_input_with_wrong_options(prompt: str, inp: str,\
+    \ options: Tuple):\n        print(prompt)\n\n        while True:\n           \
+    \ option = input(inp)\n            if option in options:\n                return\
+    \ option\n            print('\\nWrong option')\n"
+  learner_created: true
+- name: analysis.py
+  visible: true
+  text: |
+    import hashlib
+    from collections import defaultdict
+    from os import walk, path
+    from typing import List, Dict
+
+
+    class Analysis:
+        def __init__(self, folder: str, fmt: str, sorting_option):
+            self._folder = folder
+            self._format = fmt
+            self._sorting_option = sorting_option
+            self._file_dict: Dict[int, List[str]] = defaultdict(list)
+            self._hash_dict: Dict[int, Dict[str, List[str]] ] = defaultdict(lambda: defaultdict(list))
+            self._group_by_size()
+            self._sort_by_size_and_filter()
+
+        def _group_by_size(self):
+            for root, dirs, files in walk(self._folder):
+                for f_name in files:
+                    if f_name.endswith(self._format):
+                        file_path = path.join(root, f_name)
+                        size = path.getsize(file_path)
+                        self._file_dict[size].append(file_path)
+
+        def _sort_by_size_and_filter(self):
+            new_dict = defaultdict(list)
+            for s in sorted(self._file_dict.keys(),  reverse=self._sorting_option == 1):
+                if len(self._file_dict[s]) > 1:
+                    new_dict[s] = self._file_dict[s]
+            self._file_dict = new_dict
+
+        def print_sorted_by_size(self):
+            for size in self._file_dict:
+                print(f'\n{size} bytes')
+                for name in self._file_dict[size]:
+                    print(name)
+
+        def sort_by_hash(self):
+            for size in self._file_dict:
+                for file_name in self._file_dict[size]:
+                    file_dict = self._hash_dict[size]
+                    with open(file_name, 'rb') as file:
+                        hash_str = hashlib.md5(file.read()).hexdigest()
+                        file_dict[hash_str].append(file_name)
+
+            sizes = list(self._hash_dict.keys())
+            for size in sizes:
+                file_dict = self._hash_dict[size]
+                hashes = list(file_dict.keys())
+                for h in hashes:
+                    if len(file_dict[h]) <= 1:
+                        del file_dict[h]
+                if not len(file_dict):
+                    del self._hash_dict[size]
+
+        def print_sorted_by_hash(self):
+            counter = 0
+            for size in self._hash_dict:
+                print(f'\n{size} bytes')
+                file_dict = self._hash_dict[size]
+                for h in file_dict:
+                    print(f'Hash: {h}')
+                    names = file_dict[h]
+                    for name in names:
+                        counter += 1
+                        print(f'{counter}. {name}')
+  learner_created: true
 feedback_link: https://hyperskill.org/learn/step/12947#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">JetBrains
+    Academy</a> to continue learning.
+  time: "Sun, 18 Dec 2022 07:47:42 UTC"
 record: -1
